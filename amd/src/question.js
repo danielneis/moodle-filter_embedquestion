@@ -34,12 +34,13 @@ define(['core_form/changechecker',], function(FormChangeChecker) {
          */
         init: function() {
             // Only initialise if we are in a frame.
-            if (!window.frameElement) {
+            if (window.parent === window) {
                 return;
             }
 
             // Initialise the resize logic.
             t.resizeContainingFrame();
+            window.addEventListener('message', t.handleResizeRequest);
 
             // If something like an error causes junk to be output before the open <html> tag,
             // then that puts the document into BackCompat rendering mode, and the iframe keeps
@@ -67,21 +68,41 @@ define(['core_form/changechecker',], function(FormChangeChecker) {
 
         /**
          * Set the size of the containing frame to what we need.
+         *
+         * @param {boolean} [force] Whether to send the current height even if it has not changed.
          */
-        resizeContainingFrame: function() {
+        resizeContainingFrame: function(force) {
             // It seems sensible to use scrollHeight in this function, but that is
             // buggy in Safari. https://bugs.webkit.org/show_bug.cgi?id=25240 has
             // a useful table showing that body.offsetHeight is reliable.
 
             // Has the height changed?
-            if (t.currentHeight === document.body.offsetHeight) {
+            if (!force && t.currentHeight === document.body.offsetHeight) {
                 return; // No.
             }
 
             // Resize required. Do it.
             t.currentHeight = document.body.offsetHeight;
             // Extra height to allow for any horizontal scroll bar.
-            window.frameElement.style.height = (t.currentHeight + 25) + "px";
+            var height = t.currentHeight + 25;
+            if (window.frameElement) {
+                window.frameElement.style.height = height + "px";
+            }
+            window.parent.postMessage({
+                type: 'filter_embedquestion:resize',
+                height: height
+            }, '*');
+        },
+
+        /**
+         * Respond to a resize request from the parent app.
+         *
+         * @param {MessageEvent} event
+         */
+        handleResizeRequest: function(event) {
+            if (event.source === window.parent && event.data && event.data.type === 'filter_embedquestion:requestResize') {
+                t.resizeContainingFrame(true);
+            }
         }
     };
     return t;

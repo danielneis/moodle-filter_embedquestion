@@ -80,6 +80,7 @@ UI for displaying an embedded question:
   showing the question.
 * showquestion.php - the script shown in the iframe that displays a question to the user.
 * amd/src/question.js - JavaScript to ensure the iframe is always exactly the right size for the question.
+* db/mobile.php and mobileapp/init.js - register Moodle App support and resize the iframe from the parent app.
 * classes/output/renderer - standard renderer.
 * classes/output/embed_iframe, classes/output/error_message - rederable, templateable
   objects for things the renderer displays.

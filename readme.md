@@ -39,6 +39,9 @@ The filter needs to be enabled. Go to
 Site administration -> Plugins -> Filters -> Manage filters
 and Enable the Embed questions filter.
 
+The filter also supports the Moodle App. Its mobile add-on registers the filter
+handler and keeps embedded question iframes at the height reported by the question page.
+
 You probably don't need to change the options on
 Site administration -> Plugins -> Filters -> Embed questions,
 but you can if necessary.
